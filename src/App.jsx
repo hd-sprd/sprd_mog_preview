@@ -3,7 +3,7 @@ import Header from './components/Header'
 import DesignCard from './components/DesignCard'
 import DesignModal from './components/DesignModal'
 
-const PAGE_SIZE = 24
+const PAGE_SIZE = 16
 
 function parseCSV(text) {
   const lines = text.trim().split('\n')
