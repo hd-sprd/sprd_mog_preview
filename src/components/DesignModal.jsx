@@ -1,16 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import CommentSection from './CommentSection'
 
 const IMG_URL = id =>
   `https://image.spreadshirtmedia.net/image-server/v1/designs/${id}.png?width=600`
 
-export default function DesignModal({ design, onClose }) {
+export default function DesignModal({ design, onClose, scrollToComments }) {
   const { designId, userId, title } = design
+  const commentsRef = useRef(null)
 
   useEffect(() => {
     const handler = e => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
+
+  useEffect(() => {
+    if (scrollToComments && commentsRef.current) {
+      commentsRef.current.scrollTop = 0
+    }
+  }, [scrollToComments])
 
   return (
     <div
@@ -20,51 +28,63 @@ export default function DesignModal({ design, onClose }) {
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
       <div
-        className="relative z-10 bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col sm:flex-row overflow-hidden max-h-[90vh]"
+        className="relative z-10 bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
         onClick={e => e.stopPropagation()}
       >
-        {/* Image */}
-        <div className="sm:w-3/5 bg-gray-50 flex items-center justify-center p-8 sm:p-12 min-h-64">
-          <img
-            src={IMG_URL(designId)}
-            alt={title || `Design ${designId}`}
-            className="max-w-full max-h-[60vh] object-contain"
-          />
-        </div>
+        {/* Top: Image + Details — fixed, no scroll */}
+        <div className="flex flex-col sm:flex-row shrink-0">
 
-        {/* Details */}
-        <div className="sm:w-2/5 p-8 flex flex-col justify-between">
-          <div>
-            <p className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-3">Spreadshirt Design</p>
-            <h2 className="text-xl font-medium text-gray-900 leading-snug">{title || '—'}</h2>
+          {/* Image */}
+          <div className="sm:w-1/2 bg-gray-50 flex items-center justify-center p-8 sm:p-12 min-h-48">
+            <img
+              src={IMG_URL(designId)}
+              alt={title || `Design ${designId}`}
+              className="max-w-full max-h-56 sm:max-h-64 object-contain"
+            />
+          </div>
 
-            <div className="mt-8 space-y-3 text-sm text-gray-500">
-              <div className="flex justify-between border-b border-gray-100 pb-3">
-                <span>Design ID</span>
-                <span className="text-gray-900 font-mono">{designId}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-100 pb-3">
-                <span>User ID</span>
-                <span className="text-gray-900 font-mono">{userId}</span>
-              </div>
-              <div className="flex justify-between pb-3">
-                <span>Format</span>
-                <span className="text-gray-900">PNG · 1200 px</span>
+          {/* Details + actions */}
+          <div className="sm:w-1/2 flex flex-col justify-between p-7 gap-6">
+            <div>
+              <p className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-2">Spreadshirt Design</p>
+              <h2 className="text-xl font-medium text-gray-900 leading-snug">{title || '—'}</h2>
+
+              <div className="mt-6 space-y-2.5 text-xs text-gray-500">
+                <div className="flex justify-between border-b border-gray-100 pb-2.5">
+                  <span>Design ID</span>
+                  <span className="text-gray-900 font-mono">{designId}</span>
+                </div>
+                <div className="flex justify-between border-b border-gray-100 pb-2.5">
+                  <span>User ID</span>
+                  <span className="text-gray-900 font-mono">{userId}</span>
+                </div>
+                <div className="flex justify-between pb-2.5">
+                  <span>Format</span>
+                  <span className="text-gray-900">PNG · 600 px</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-8 space-y-3">
-            <button className="w-full bg-gray-900 text-white text-sm tracking-wide py-3.5 hover:bg-gray-700 transition-colors">
-              Add to Cart
-            </button>
-            <button
-              onClick={onClose}
-              className="w-full border border-gray-200 text-gray-600 text-sm tracking-wide py-3.5 hover:border-gray-400 transition-colors"
-            >
-              Close
-            </button>
+            <div className="space-y-2">
+              <button className="w-full bg-gray-900 text-white text-xs tracking-widest uppercase py-3 hover:bg-gray-700 transition-colors">
+                Add to Cart
+              </button>
+              <button
+                onClick={onClose}
+                className="w-full border border-gray-200 text-gray-500 text-xs tracking-wide py-3 hover:border-gray-400 transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
+        </div>
+
+        {/* Bottom: Comments — scrollable */}
+        <div
+          ref={commentsRef}
+          className="border-t border-gray-100 overflow-y-auto flex-1 min-h-0 px-7 pb-7"
+        >
+          <CommentSection designId={designId} />
         </div>
 
         {/* X */}

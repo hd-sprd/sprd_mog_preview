@@ -7,25 +7,40 @@
   body { @apply bg-white text-gray-900 font-sans; }
 }
 
-/* Mosaic reveal: blur → sharp, staggered per card */
+/* Heart-reveal: card materializes through a growing heart mask */
 @keyframes revealCard {
   0% {
+    mask-size: 0% 0%;
+    -webkit-mask-size: 0% 0%;
     opacity: 0;
-    filter: blur(16px) saturate(0.3);
-    transform: scale(1.04);
+    filter: blur(14px) saturate(0.3);
+    transform: scale(1.05);
   }
-  60% {
+  18% {
     opacity: 1;
-    filter: blur(4px) saturate(0.8);
+  }
+  65% {
+    filter: blur(2px) saturate(0.9);
     transform: scale(1.01);
   }
   100% {
-    opacity: 1;
+    mask-size: 500% 500%;
+    -webkit-mask-size: 500% 500%;
     filter: blur(0px) saturate(1);
     transform: scale(1);
   }
 }
 
 .card-reveal {
-  animation: revealCard 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='white' d='M50,30 C50,20,35,10,20,20 C5,30,5,50,20,65 L50,90 L80,65 C95,50,95,30,80,20 C65,10,50,20,50,30Z'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='white' d='M50,30 C50,20,35,10,20,20 C5,30,5,50,20,65 L50,90 L80,65 C95,50,95,30,80,20 C65,10,50,20,50,30Z'/%3E%3C/svg%3E");
+  mask-position: center;
+  -webkit-mask-position: center;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  animation: revealCard 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* Hide scrollbar on category tab row */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
