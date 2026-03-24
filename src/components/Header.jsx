@@ -5,7 +5,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <a href="/" className="text-sm font-semibold tracking-[0.15em] uppercase text-gray-900">
-            Spreadhub
+            SPREADSHIRT
           </a>
 
           {/* Nav */}
