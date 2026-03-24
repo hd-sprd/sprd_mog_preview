@@ -3,10 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    box-sizing: border-box;
+  * { box-sizing: border-box; }
+  body { @apply bg-white text-gray-900 font-sans; }
+}
+
+/* Mosaic reveal: blur → sharp, staggered per card */
+@keyframes revealCard {
+  0% {
+    opacity: 0;
+    filter: blur(16px) saturate(0.3);
+    transform: scale(1.04);
   }
-  body {
-    @apply bg-white text-gray-900 font-sans;
+  60% {
+    opacity: 1;
+    filter: blur(4px) saturate(0.8);
+    transform: scale(1.01);
   }
+  100% {
+    opacity: 1;
+    filter: blur(0px) saturate(1);
+    transform: scale(1);
+  }
+}
+
+.card-reveal {
+  animation: revealCard 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

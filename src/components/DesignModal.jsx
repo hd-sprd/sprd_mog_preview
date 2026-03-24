@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 const IMG_URL = id =>
-  `https://image.spreadshirt.net/image-server/v1/designs/${id}.png?width=1200`
+  `https://image.spreadshirtmedia.net/image-server/v1/designs/${id}.png?width=600`
 
 export default function DesignModal({ design, onClose }) {
   const { designId, userId, title } = design
