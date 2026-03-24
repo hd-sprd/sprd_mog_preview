@@ -3,8 +3,9 @@ import { useEffect } from 'react'
 const IMG_URL = id =>
   `https://image.spreadshirt.net/image-server/v1/designs/${id}.png?width=1200`
 
-export default function DesignModal({ id, onClose }) {
-  // Close on ESC
+export default function DesignModal({ design, onClose }) {
+  const { designId, userId, title } = design
+
   useEffect(() => {
     const handler = e => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
@@ -16,10 +17,8 @@ export default function DesignModal({ id, onClose }) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8"
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      {/* Panel */}
       <div
         className="relative z-10 bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col sm:flex-row overflow-hidden max-h-[90vh]"
         onClick={e => e.stopPropagation()}
@@ -27,8 +26,8 @@ export default function DesignModal({ id, onClose }) {
         {/* Image */}
         <div className="sm:w-3/5 bg-gray-50 flex items-center justify-center p-8 sm:p-12 min-h-64">
           <img
-            src={IMG_URL(id)}
-            alt={`Design ${id}`}
+            src={IMG_URL(designId)}
+            alt={title || `Design ${designId}`}
             className="max-w-full max-h-[60vh] object-contain"
           />
         </div>
@@ -36,22 +35,21 @@ export default function DesignModal({ id, onClose }) {
         {/* Details */}
         <div className="sm:w-2/5 p-8 flex flex-col justify-between">
           <div>
-            <p className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-2">Spreadshirt Design</p>
-            <h2 className="text-2xl font-light text-gray-900 mb-1">Design Preview</h2>
-            <p className="text-sm text-gray-400 font-mono">#{id}</p>
+            <p className="text-xs tracking-[0.2em] uppercase text-gray-400 mb-3">Spreadshirt Design</p>
+            <h2 className="text-xl font-medium text-gray-900 leading-snug">{title || '—'}</h2>
 
             <div className="mt-8 space-y-3 text-sm text-gray-500">
               <div className="flex justify-between border-b border-gray-100 pb-3">
-                <span>Format</span>
-                <span className="text-gray-900">PNG</span>
+                <span>Design ID</span>
+                <span className="text-gray-900 font-mono">{designId}</span>
               </div>
               <div className="flex justify-between border-b border-gray-100 pb-3">
-                <span>Resolution</span>
-                <span className="text-gray-900">1200 px</span>
+                <span>User ID</span>
+                <span className="text-gray-900 font-mono">{userId}</span>
               </div>
               <div className="flex justify-between pb-3">
-                <span>ID</span>
-                <span className="text-gray-900 font-mono">{id}</span>
+                <span>Format</span>
+                <span className="text-gray-900">PNG · 1200 px</span>
               </div>
             </div>
           </div>
@@ -69,7 +67,7 @@ export default function DesignModal({ id, onClose }) {
           </div>
         </div>
 
-        {/* X button */}
+        {/* X */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors"
