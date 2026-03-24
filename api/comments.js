@@ -1,29 +1,12 @@
-// Vercel serverless function – comments
-// Note: /tmp/ is ephemeral (resets on cold start). For persistence use a DB.
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { join } from 'path'
+// Vercel serverless – comments (persistent via Vercel KV / Redis)
+import { kv } from '@vercel/kv'
 
-const FILE = '/tmp/comments.csv'
-
-function ensure() {
-  if (!existsSync(FILE)) writeFileSync(FILE, 'designId;timestamp;comment\n')
-}
+const MAX_CHARS = 255
+const INVALID_RE = /[<>&"\\;]/
 
 function isValid(text) {
   return typeof text === 'string' && text.trim().length > 0 &&
-    text.length <= 255 && !/[<>&"\\;]/.test(text)
-}
-
-function getComments(designId) {
-  ensure()
-  return readFileSync(FILE, 'utf-8').trim().split('\n').slice(1).filter(Boolean)
-    .map(l => { const p = l.split(';'); return { designId: p[0], timestamp: p[1], comment: p.slice(2).join(';') } })
-    .filter(c => c.designId === designId)
-}
-
-function addComment(designId, comment) {
-  ensure()
-  writeFileSync(FILE, readFileSync(FILE, 'utf-8') + `${designId};${new Date().toISOString()};${comment}\n`)
+    text.length <= MAX_CHARS && !INVALID_RE.test(text)
 }
 
 export default async function handler(req, res) {
@@ -31,16 +14,25 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json')
 
   if (req.method === 'GET') {
-    const designId = req.query.designId
+    const { designId } = req.query
     if (!designId) return res.status(400).json({ error: 'Missing designId' })
-    return res.status(200).json({ comments: getComments(designId) })
+    const [raw, upvoteCount] = await Promise.all([
+      kv.lrange(`comments:${designId}`, 0, -1),
+      kv.hget('upvotes', designId),
+    ])
+    const comments = (raw || []).map(c => typeof c === 'string' ? JSON.parse(c) : c)
+    return res.status(200).json({ comments, upvotes: Number(upvoteCount || 0) })
   }
 
   if (req.method === 'POST') {
     const { designId, comment } = req.body || {}
     if (!designId || !comment) return res.status(400).json({ error: 'Missing fields' })
     if (!isValid(comment)) return res.status(422).json({ error: 'Invalid comment (max 255 chars, no special characters)' })
-    addComment(designId, comment.trim())
+    const entry = { designId, timestamp: new Date().toISOString(), comment: comment.trim() }
+    await Promise.all([
+      kv.rpush(`comments:${designId}`, JSON.stringify(entry)),
+      kv.hincrby('comment_counts', designId, 1),
+    ])
     return res.status(200).json({ ok: true })
   }
 
