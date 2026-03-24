@@ -3,18 +3,14 @@ import { useState } from 'react'
 const IMG_URL = id =>
   `https://image.spreadshirtmedia.net/image-server/v1/designs/${id}.png?width=300`
 
-export default function DesignCard({ design, index, upvotes, comments, onClick, onCommentClick }) {
+export default function DesignCard({ design, upvotes, comments, onClick, onCommentClick }) {
   const [loaded, setLoaded] = useState(false)
   const { designId, userId, title } = design
-
-  // Stagger: max 8 cols × rows, cap delay at ~700ms for large grids
-  const delay = Math.min(index * 40, 700)
 
   return (
     <article
       onClick={onClick}
-      className="group cursor-pointer card-reveal"
-      style={{ animationDelay: `${delay}ms` }}
+      className={`group cursor-pointer ${loaded ? 'card-reveal' : 'opacity-0'}`}
     >
       {/* Image */}
       <div className="relative aspect-square bg-gray-50 group-hover:bg-gray-200 transition-colors duration-300 overflow-hidden rounded-sm">
