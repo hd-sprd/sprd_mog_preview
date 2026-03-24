@@ -183,6 +183,14 @@ export default function App() {
 
   const triggerAnim = useCallback(() => setAnimKey(k => k + 1), [])
 
+  const handleStatsChange = useCallback((designId, type) => {
+    setStats(prev => {
+      if (type === 'upvote')  return { ...prev, upvotes:  { ...prev.upvotes,  [designId]: (prev.upvotes[designId]  || 0) + 1 } }
+      if (type === 'comment') return { ...prev, comments: { ...prev.comments, [designId]: (prev.comments[designId] || 0) + 1 } }
+      return prev
+    })
+  }, [])
+
   const handleSearch = e => {
     setQuery(e.target.value)
     setPage(1)
@@ -411,6 +419,7 @@ export default function App() {
           design={selected}
           onClose={() => { setSelected(null); setScrollToComments(false) }}
           scrollToComments={scrollToComments}
+          onStatsChange={handleStatsChange}
         />
       )}
     </div>

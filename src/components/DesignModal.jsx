@@ -4,7 +4,7 @@ import CommentSection from './CommentSection'
 const IMG_URL = id =>
   `https://image.spreadshirtmedia.net/image-server/v1/designs/${id}.png?width=600`
 
-export default function DesignModal({ design, onClose, scrollToComments }) {
+export default function DesignModal({ design, onClose, scrollToComments, onStatsChange }) {
   const { designId, userId, title } = design
   const commentsRef = useRef(null)
 
@@ -84,7 +84,7 @@ export default function DesignModal({ design, onClose, scrollToComments }) {
           ref={commentsRef}
           className="border-t border-gray-100 overflow-y-auto flex-1 min-h-0 px-7 pb-7"
         >
-          <CommentSection designId={designId} />
+          <CommentSection designId={designId} onStatsChange={onStatsChange} />
         </div>
 
         {/* X */}

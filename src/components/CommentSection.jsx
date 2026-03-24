@@ -35,7 +35,7 @@ function timeAgo(ts) {
   return `${Math.floor(diff / 86400)}d ago`
 }
 
-export default function CommentSection({ designId }) {
+export default function CommentSection({ designId, onStatsChange }) {
   const [comments, setComments]     = useState([])
   const [upvotes, setUpvotes]       = useState(0)
   const [text, setText]             = useState('')
@@ -68,6 +68,7 @@ export default function CommentSection({ designId }) {
       const data = await res.json()
       setUpvotes(data.upvotes)
       setVoted(true)
+      onStatsChange?.(designId, 'upvote')
     } catch {}
     setUpvoting(false)
   }
@@ -91,6 +92,7 @@ export default function CommentSection({ designId }) {
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Error'); setSubmitting(false); return }
       setComments(prev => [...prev, { designId, timestamp: new Date().toISOString(), comment: trimmed }])
+      onStatsChange?.(designId, 'comment')
       setText('')
     } catch { setError('Network error') }
     setSubmitting(false)
